@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<script src='http://d3js.org/d3.v4.js'></script>
+		<script src="test.js"></script>
+		<!-- <script src="../build/myCode.js"></script> -->
+		
+	
+	</head>
+	<body>
+	   
+		
+	</body>
+	<script>
+    // var pivotData = data => data.reduce((acc,s)=>[...acc,...Object.keys(s)],[]).filter((d,i,self)=>self.indexOf(d)===i).reduce((acc,c)=>{
+    // 	acc[c]=data.map((s)=>s.hasOwnProperty(c)?s[c]:null)
+    // 	return acc;
+    // },{})
+    
+    var pivotData = data => data.reduce((acc,d,index)=>{
+    	Object.keys(d).forEach((k)=>{
+        	if (!acc.hasOwnProperty(k))acc[k]={}
+        	acc[k][index]=d[k]	
+        })
+        return acc;
+    },{})
+    
+
+  
+   
+	</script>
+</html>
