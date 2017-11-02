@@ -11414,6 +11414,9 @@ var d3 = _interopRequireWildcard(_d);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+var lineStyle = { strokeWidth: '1px', fill: 'none' };
+var rectStyle = { stroke: 'none' };
+
 var tranSlate = exports.tranSlate = function tranSlate(x, y) {
     return 'translate(' + x + ',' + y + ')';
 };
@@ -11421,7 +11424,9 @@ var drawCircle = exports.drawCircle = function drawCircle(radius) {
     return 'M ' + (0 - radius) + ' ' + 0 + ' a ' + radius + ' ' + radius + ', 0, 1, 0, ' + radius * 2 + ' ' + 0 + ' ' + 'a ' + radius + ' ' + radius + ', 0, 1, 0, ' + -radius * 2 + ' ' + 0;
 };
 var drawRect = exports.drawRect = function drawRect(width, height) {
-    return 'M' + (0 - width / 2) + ',' + (0 - height / 2) + ' h ' + width + ' v ' + height + ' h ' + (0 - width) + ' Z ';
+    var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var y = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+    return 'M' + (x - width / 2) + ',' + (y - height / 2) + ' h ' + width + ' v ' + height + ' h ' + (0 - width) + ' Z ';
 };
 var drawLine = exports.drawLine = function drawLine(sourse, target) {
     return 'M' + sourse.x + ',' + sourse.y + ' L ' + target.x + ',' + target.y;
@@ -11462,28 +11467,40 @@ var scaleBand = exports.scaleBand = function scaleBand(range, domain) {
 };
 
 var colorFn = exports.colorFn = function colorFn(values) {
-    return d3.scaleSequential().domain([d3.max(values), d3.min(values)]).interpolator(d3.interpolateRainbow);
+    return d3.scaleSequential().domain([d3.max(values), d3.min(values)]).interpolator(d3.interpolateWarm);
 };
 
-//draw one Line plot
 var createLine = exports.createLine = function createLine(dataset, width, height) {
     var values = Object.values(dataset);
+    var xScale = d3.scaleBand().range([0, width]).domain(Object.keys(dataset));
+    var bandwidth = xScale.bandwidth();
     if (values.map(function (v) {
         return typeof v === 'undefined' ? 'undefined' : _typeof(v);
     }).includes('number')) {
 
-        var xScale = d3.scalePoint().range([0, width]).domain(Object.keys(dataset));
-        var yScale = d3.scaleLinear().range([0, height]).domain([d3.min(values), d3.max(values)]).nice();
+        var yScale = d3.scaleLinear().range([height, 0]).domain([d3.min(values), d3.max(values)]).nice();
         var lineFunction = d3.line().x(function (d) {
-            return xScale(d[0]);
+            return xScale(d[0]) + bandwidth * 0.5;
         }).y(function (d) {
             return yScale(d[1]);
         }).curve(d3.curveMonotoneX);
-        return lineFunction(Object.entries(values).filter(function (e) {
-            return e[1] !== null;
-        }));
+        return [Object.assign({ d: lineFunction(Object.entries(values).filter(function (e) {
+                return e[1] !== null;
+            })), stroke: '#000000' }, lineStyle)];
     } else {
-        return '';
+
+        var uniqueV = values.filter(function (d, i, self) {
+            return self.indexOf(d) === i;
+        });
+        var colorfn = colorFn(uniqueV.map(function (d, i) {
+            return i;
+        }));
+
+        return Object.entries(values).filter(function (e) {
+            return e[1] !== null;
+        }).map(function (e) {
+            return Object.assign({ d: drawRect(bandwidth, height, xScale(e[0]) + bandwidth * 0.5, height * 0.5), fill: colorfn(uniqueV.indexOf(e[1])) }, rectStyle);
+        });
     }
 };
 
@@ -18961,6 +18978,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _react = __webpack_require__(140);
 
 var _react2 = _interopRequireDefault(_react);
@@ -18974,28 +18993,43 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var textStyle = { textAnchor: 'start', dominantBaseline: 'middle', fill: '#000000', fontSize: '1em' };
-var linksStyle = { stroke: '#000000', strokeWidth: '1px', fill: 'none' };
+var lineStyle = { strokeWidth: '1px', fill: 'none' };
+var rectStyle = { stroke: 'none' };
+
+var Plot = function Plot(props) {
+    var lines = utility.createLine(props.data, props.width, props.height).map(function (line, index) {
+        return _react2.default.createElement('path', _extends({ key: index }, line));
+    });
+    return _react2.default.createElement(
+        'svg',
+        { width: props.width, height: props.height },
+        lines
+    );
+};
 
 var Row = function Row(props) {
 
-    var d = utility.createLine(props.data, props.width, props.height);
     return _react2.default.createElement(
-        'g',
-        { transform: utility.tranSlate(props.x, props.y) },
-        _react2.default.createElement('path', { d: d, style: linksStyle })
+        'div',
+        null,
+        _react2.default.createElement(
+            'h3',
+            null,
+            props.text
+        ),
+        _react2.default.createElement(Plot, { data: props.data, width: props.width, height: props.height })
     );
 };
 
 var Panel = function Panel(props) {
-    var cellHeight = props.height / Object.keys(props.data).length;
 
     var rows = Object.entries(props.data).map(function (entry, index) {
-        return _react2.default.createElement(Row, { key: index, text: entry[0], data: entry[1], x: 0, y: (index + 0.5) * cellHeight, width: props.width, height: cellHeight });
+        return _react2.default.createElement(Row, { key: index, text: entry[0], data: entry[1], width: props.width, height: props.height / Object.keys(props.data).length });
     });
 
     return _react2.default.createElement(
-        'svg',
-        { width: props.width, height: props.height },
+        'div',
+        null,
         rows
     );
 };
