@@ -2,28 +2,28 @@
 	<head>
 		<script src='http://d3js.org/d3.v4.js'></script>
 		<script src="test.js"></script>
-		<!-- <script src="../build/myCode.js"></script> -->
+		<script src="../build/myCode.js"></script>
 		
 	
 	</head>
 	<body>
-	   
-		
+	 	<div id="container"></div>
+
 	</body>
 	<script>
-    // var pivotData = data => data.reduce((acc,s)=>[...acc,...Object.keys(s)],[]).filter((d,i,self)=>self.indexOf(d)===i).reduce((acc,c)=>{
-    // 	acc[c]=data.map((s)=>s.hasOwnProperty(c)?s[c]:null)
-    // 	return acc;
-    // },{})
     
-    var pivotData = data => data.reduce((acc,d,index)=>{
+    var pivotData = data => {
+    	let frame = {...d3.range(data.length).map((d)=>null)}
+    	console.log(frame)
+    	return data.reduce((acc,d,index)=>{
+
     	Object.keys(d).forEach((k)=>{
-        	if (!acc.hasOwnProperty(k))acc[k]={}
+        	if (!acc.hasOwnProperty(k))acc[k]={...frame}
         	acc[k][index]=d[k]	
         })
         return acc;
     },{})
-    
+   }
 
   
    

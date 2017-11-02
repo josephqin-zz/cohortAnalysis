@@ -9,8 +9,8 @@ var config = {
   entry: SRC  + "/index.jsx",
   output: {
     path:OUTPUT,
-    // library:'co',
-    // libraryTarget:'umd',
+    library:'Panel',
+    libraryTarget:'umd',
     filename:'myCode.js'
   },
   module: {
