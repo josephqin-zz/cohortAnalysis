@@ -11400,11 +11400,9 @@ module.exports = lowPriorityWarning;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
-exports.pivotData = exports.createLine = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+exports.sort2D = exports.canvasDraw = exports.createLine = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -11414,109 +11412,174 @@ var d3 = _interopRequireWildcard(_d);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var lineStyle = { strokeWidth: '1px', fill: 'none' };
 var rectStyle = { stroke: 'none' };
 
 var tranSlate = exports.tranSlate = function tranSlate(x, y) {
-    return 'translate(' + x + ',' + y + ')';
+  return 'translate(' + x + ',' + y + ')';
 };
 var drawCircle = exports.drawCircle = function drawCircle(radius) {
-    return 'M ' + (0 - radius) + ' ' + 0 + ' a ' + radius + ' ' + radius + ', 0, 1, 0, ' + radius * 2 + ' ' + 0 + ' ' + 'a ' + radius + ' ' + radius + ', 0, 1, 0, ' + -radius * 2 + ' ' + 0;
+  return 'M ' + (0 - radius) + ' ' + 0 + ' a ' + radius + ' ' + radius + ', 0, 1, 0, ' + radius * 2 + ' ' + 0 + ' ' + 'a ' + radius + ' ' + radius + ', 0, 1, 0, ' + -radius * 2 + ' ' + 0;
 };
 var drawRect = exports.drawRect = function drawRect(width, height) {
-    var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var y = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-    return 'M' + (x - width / 2) + ',' + (y - height / 2) + ' h ' + width + ' v ' + height + ' h ' + (0 - width) + ' Z ';
+  var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var y = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  return 'M' + (x - width / 2) + ',' + (y - height / 2) + ' h ' + width + ' v ' + height + ' h ' + (0 - width) + ' Z ';
 };
 var drawLine = exports.drawLine = function drawLine(sourse, target) {
-    return 'M' + sourse.x + ',' + sourse.y + ' L ' + target.x + ',' + target.y;
+  return 'M' + sourse.x + ',' + sourse.y + ' L ' + target.x + ',' + target.y;
 };
 
 //oldRange,Maxlines,step => newRange
 var pagination = exports.pagination = function pagination(oldRange, boundry, step) {
-    return oldRange.length < boundry && oldRange[0] + step >= 0 && oldRange[oldRange.length - 1] + step <= boundry ? oldRange.map(function (d) {
-        return d + step;
-    }) : oldRange;
+  return oldRange.length < boundry && oldRange[0] + step >= 0 && oldRange[oldRange.length - 1] + step <= boundry ? oldRange.map(function (d) {
+    return d + step;
+  }) : oldRange;
 };
 var createArray = exports.createArray = d3.range;
 
 //dendrogram
 var dendrogram = exports.dendrogram = function dendrogram(data, width, height) {
-    var root = d3.hierarchy(data);
-    var cluster = d3.cluster().size([width, height]).separation(function (a, b) {
-        return a.parent == b.parent ? 1 : 1;
-    });
-    cluster(root);
-    return root;
+  var root = d3.hierarchy(data);
+  var cluster = d3.cluster().size([width, height]).separation(function (a, b) {
+    return a.parent == b.parent ? 1 : 1;
+  });
+  cluster(root);
+  return root;
 };
 
 //draw the links from parent to children
 var drawBraceLine = exports.drawBraceLine = function drawBraceLine(node, nodes) {
-    return drawLine({ y: node.y, x: d3.max(nodes.map(function (d) {
-            return d.x;
-        })) }, { y: node.y, x: d3.min(nodes.map(function (d) {
-            return d.x;
-        })) }) + nodes.map(function (d) {
-        return drawLine({ y: node.y, x: d.x }, d);
-    }).join('');
+  return drawLine({ y: node.y, x: d3.max(nodes.map(function (d) {
+      return d.x;
+    })) }, { y: node.y, x: d3.min(nodes.map(function (d) {
+      return d.x;
+    })) }) + nodes.map(function (d) {
+    return drawLine({ y: node.y, x: d.x }, d);
+  }).join('');
 };
 
 //scaleBand
 var scaleBand = exports.scaleBand = function scaleBand(range, domain) {
-    return d3.scaleBand.range(range).domain(domain);
+  return d3.scaleBand.range(range).domain(domain);
 };
 
 var colorFn = exports.colorFn = function colorFn(values) {
-    return d3.scaleSequential().domain([d3.max(values), d3.min(values)]).interpolator(d3.interpolateWarm);
+  return d3.scaleSequential().domain([d3.max(values), d3.min(values)]).interpolator(d3.interpolateWarm);
 };
 
 var createLine = exports.createLine = function createLine(dataset, width, height) {
-    var values = Object.values(dataset);
-    var xScale = d3.scaleBand().range([0, width]).domain(Object.keys(dataset));
-    var bandwidth = xScale.bandwidth();
-    if (values.map(function (v) {
-        return typeof v === 'undefined' ? 'undefined' : _typeof(v);
-    }).includes('number')) {
 
-        var yScale = d3.scaleLinear().range([height, 0]).domain([d3.min(values), d3.max(values)]).nice();
-        var lineFunction = d3.line().x(function (d) {
-            return xScale(d[0]) + bandwidth * 0.5;
-        }).y(function (d) {
-            return yScale(d[1]);
-        }).curve(d3.curveMonotoneX);
-        return [Object.assign({ d: lineFunction(Object.entries(values).filter(function (e) {
-                return e[1] !== null;
-            })), stroke: '#000000' }, lineStyle)];
-    } else {
+  var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
+  var bandwidth = xScale.bandwidth();
+  if (dataset.map(function (v) {
+    return typeof v === 'undefined' ? 'undefined' : _typeof(v);
+  }).includes('number')) {
 
-        var uniqueV = values.filter(function (d, i, self) {
-            return self.indexOf(d) === i;
-        });
-        var colorfn = colorFn(uniqueV.map(function (d, i) {
-            return i;
-        }));
+    var yScale = d3.scaleLinear().range([height, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
+    var lineFunction = d3.line().x(function (d, index) {
+      return xScale(index) + bandwidth * 0.5;
+    }).y(function (d) {
+      return d ? yScale(d) : yScale(0);
+    }).curve(d3.curveMonotoneX);
+    return [Object.assign({ d: lineFunction(dataset), stroke: '#000000' }, lineStyle)];
+  } else {
 
-        return Object.entries(values).filter(function (e) {
-            return e[1] !== null;
-        }).map(function (e) {
-            return Object.assign({ d: drawRect(bandwidth, height, xScale(e[0]) + bandwidth * 0.5, height * 0.5), fill: colorfn(uniqueV.indexOf(e[1])) }, rectStyle);
-        });
-    }
+    var uniqueV = dataset.filter(function (d, i, self) {
+      return self.indexOf(d) === i;
+    });
+    var colorfn = colorFn(uniqueV.map(function (d, i) {
+      return i;
+    }));
+
+    return dataset.map(function (e, index) {
+      return Object.assign({ d: drawRect(bandwidth, height, xScale(index) + bandwidth * 0.5, height * 0.5), fill: e ? colorfn(uniqueV.indexOf(e)) : '#ffffff' }, rectStyle);
+    });
+  }
+};
+
+//canvas draw
+var canvasDraw = exports.canvasDraw = function canvasDraw(ctx, dataset, width, height) {
+
+  var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
+  var bandwidth = xScale.bandwidth();
+  if (dataset.map(function (v) {
+    return typeof v === 'undefined' ? 'undefined' : _typeof(v);
+  }).includes('number')) {
+
+    var yScale = d3.scaleLinear().range([height - 5, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
+    var lineFunction = d3.line().x(function (d, index) {
+      return xScale(index);
+    }).y(function (d) {
+      return d ? yScale(d) : yScale(0);
+    }).curve(d3.curveMonotoneX).context(ctx);
+    ctx.beginPath();
+    lineFunction(dataset);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "steelblue";
+    ctx.stroke();
+  } else {
+
+    var uniqueV = dataset.filter(function (d, i, self) {
+      return self.indexOf(d) === i;
+    });
+    var colorfn = colorFn(uniqueV.map(function (d, i) {
+      return i;
+    }));
+
+    dataset.forEach(function (e, index) {
+      ctx.fillStyle = e ? colorfn(uniqueV.indexOf(e)) : '#ffffff';
+      ctx.fillRect(xScale(index), 0, bandwidth, height);
+    });
+  }
 };
 
 //get attrTable
-var pivotData = exports.pivotData = function pivotData(data) {
-    var frame = _extends({}, d3.range(data.length).map(function (d) {
-        return null;
-    }));
-    return data.reduce(function (acc, d, index) {
+// export var pivotData = data => {
+//         let frame = {...d3.range(data.length).map((d)=>null)}
+//         return data.reduce((acc,d,index)=>{
 
-        Object.keys(d).forEach(function (k) {
-            if (!acc.hasOwnProperty(k)) acc[k] = _extends({}, frame);
-            acc[k][index] = d[k];
+//         Object.keys(d).forEach((k)=>{
+//             if (!acc.hasOwnProperty(k))acc[k]={...frame}
+//             acc[k][index]=d[k]  
+//         })
+//         return acc;
+//     },{})
+//    }
+
+var pivotData = function pivotData(data) {
+  return data.reduce(function (acc, d) {
+    var diff = Object.keys(d).filter(function (a) {
+      return acc.keys.indexOf(a) === -1;
+    });
+
+    if (diff.length > 0) {
+      acc.keys = [].concat(_toConsumableArray(acc.keys), _toConsumableArray(diff));
+      acc.values = [].concat(_toConsumableArray(acc.values), _toConsumableArray(diff.map(function (a) {
+        return data.map(function (d) {
+          return d[a];
         });
-        return acc;
-    }, {});
+      })));
+    }
+    return acc;
+  }, { keys: [], values: [] });
+};
+
+var sort2D = exports.sort2D = function sort2D(aa, rowid, fn) {
+  var newindex = aa[rowid].map(function (value, index) {
+    return { index: index, value: value };
+  }).sort(function (a, b) {
+    return fn(a.value, b.value);
+  }).map(function (d) {
+    return d.index;
+  });
+  return aa.map(function (a) {
+    return newindex.map(function (i) {
+      return a[i];
+    });
+  });
 };
 
 /***/ }),
@@ -18978,6 +19041,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _react = __webpack_require__(140);
@@ -18991,6 +19056,12 @@ var utility = _interopRequireWildcard(_utility);
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var textStyle = { textAnchor: 'start', dominantBaseline: 'middle', fill: '#000000', fontSize: '1em' };
 var lineStyle = { strokeWidth: '1px', fill: 'none' };
@@ -19007,6 +19078,46 @@ var Plot = function Plot(props) {
     );
 };
 
+var Canvas = function (_React$Component) {
+    _inherits(Canvas, _React$Component);
+
+    function Canvas(props) {
+        _classCallCheck(this, Canvas);
+
+        return _possibleConstructorReturn(this, (Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call(this, props));
+    }
+
+    _createClass(Canvas, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            this.updateCanvas();
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            this.updateCanvas();
+        }
+    }, {
+        key: 'updateCanvas',
+        value: function updateCanvas() {
+            var ctx = this.canvas.getContext('2d');
+            ctx.clearRect(0, 0, this.props.width, this.props.height);
+            utility.canvasDraw(ctx, this.props.data, this.props.width, this.props.height);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            return _react2.default.createElement('canvas', { ref: function ref(_ref) {
+                    return _this2.canvas = _ref;
+                }, width: this.props.width, height: this.props.height });
+        }
+    }]);
+
+    return Canvas;
+}(_react2.default.Component);
+
 var Row = function Row(props) {
 
     return _react2.default.createElement(
@@ -19014,25 +19125,56 @@ var Row = function Row(props) {
         null,
         _react2.default.createElement(
             'h3',
-            null,
+            { onClick: function onClick() {
+                    return props.sortFn(props.text);
+                } },
             props.text
         ),
-        _react2.default.createElement(Plot, { data: props.data, width: props.width, height: props.height })
+        _react2.default.createElement(Canvas, { data: props.data, width: props.width, height: props.height })
     );
 };
 
-var Panel = function Panel(props) {
+var Panel = function (_React$Component2) {
+    _inherits(Panel, _React$Component2);
 
-    var rows = Object.entries(props.data).map(function (entry, index) {
-        return _react2.default.createElement(Row, { key: index, text: entry[0], data: entry[1], width: props.width, height: props.height / Object.keys(props.data).length });
-    });
+    function Panel(props) {
+        _classCallCheck(this, Panel);
 
-    return _react2.default.createElement(
-        'div',
-        null,
-        rows
-    );
-};
+        var _this3 = _possibleConstructorReturn(this, (Panel.__proto__ || Object.getPrototypeOf(Panel)).call(this, props));
+
+        _this3.state = { order: 0 };
+        return _this3;
+    }
+
+    _createClass(Panel, [{
+        key: 'sortHandler',
+        value: function sortHandler(name) {
+
+            this.setState({ order: this.props.data.keys.indexOf(name) });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this4 = this;
+
+            var dataset = utility.sort2D(this.props.data.values, this.state.order, function (a, b) {
+                return b - a;
+            });
+
+            var rows = dataset.map(function (entry, index) {
+                return _react2.default.createElement(Row, { key: index, text: _this4.props.data.keys[index], data: entry, width: _this4.props.width, height: _this4.props.height / _this4.props.data.keys.length, sortFn: _this4.sortHandler.bind(_this4) });
+            });
+
+            return _react2.default.createElement(
+                'div',
+                null,
+                rows
+            );
+        }
+    }]);
+
+    return Panel;
+}(_react2.default.Component);
 
 exports.default = Panel;
 
@@ -19093,7 +19235,7 @@ renderModule.setContainer = function (data) {
 
 renderModule.bindData = function (data) {
 	if (!arguments.length) return dataset;
-	dataset = (0, _utility.pivotData)(data);
+	dataset = data;
 	return this;
 };
 

@@ -30,40 +30,90 @@ export var colorFn = (values)=>d3.scaleSequential().domain([d3.max(values),d3.mi
 
 
 export var createLine = function(dataset,width,height){
-    let values = Object.values(dataset);
-    let xScale = d3.scaleBand().range([0,width]).domain(Object.keys(dataset));
+    
+
+    let xScale = d3.scaleBand().range([0,width]).domain(d3.range(dataset.length));
     let bandwidth = xScale.bandwidth();
-    if(values.map((v)=>typeof v).includes('number')){
+    if(dataset.map((v)=>typeof v).includes('number')){
 
     
-    let yScale = d3.scaleLinear().range([height,0]).domain([d3.min(values),d3.max(values)]).nice();
+    let yScale = d3.scaleLinear().range([height,0]).domain([d3.min(dataset),d3.max(dataset)]).nice();
     let lineFunction = d3.line()
-                               .x(function (d) {return xScale(d[0])+bandwidth*0.5;})
-                               .y(function (d) {return yScale(d[1]);})
+                               .x(function (d,index) {return xScale(index)+bandwidth*0.5;})
+                               .y(function (d) {return d?yScale(d):yScale(0)})
                                .curve(d3.curveMonotoneX)
-    return [Object.assign({d:lineFunction(Object.entries(values).filter((e)=>e[1]!==null)),stroke:'#000000'},lineStyle)];                           
+    return [Object.assign({d:lineFunction(dataset),stroke:'#000000'},lineStyle)];                           
 
     }else{
     
-    let uniqueV = values.filter((d,i,self)=>self.indexOf(d)===i)
+    let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i)
     let colorfn = colorFn(uniqueV.map((d,i)=>i))
 
-    return Object.entries(values).filter((e)=>e[1]!==null).map((e)=>(Object.assign({d:drawRect(bandwidth,height,xScale(e[0])+bandwidth*0.5,height*0.5),fill:colorfn(uniqueV.indexOf(e[1]))},rectStyle)))   
+    return dataset.map((e,index)=>(Object.assign({d:drawRect(bandwidth,height,xScale(index)+bandwidth*0.5,height*0.5),fill:e?colorfn(uniqueV.indexOf(e)):'#ffffff'},rectStyle)))   
+    }
+}
+
+//canvas draw
+export var canvasDraw = function(ctx,dataset,width,height){
+    
+    let xScale = d3.scaleBand().range([0,width]).domain(d3.range(dataset.length));
+    let bandwidth = xScale.bandwidth();
+    if(dataset.map((v)=>typeof v).includes('number')){
+
+    
+    let yScale = d3.scaleLinear().range([height-5,0]).domain([d3.min(dataset),d3.max(dataset)]).nice();
+    let lineFunction = d3.line()
+                               .x((d,index)=> xScale(index))
+                               .y((d)=>d?yScale(d):yScale(0))
+                               .curve(d3.curveMonotoneX)
+                               .context(ctx);
+    ctx.beginPath();
+    lineFunction(dataset); 
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "steelblue";
+    ctx.stroke();                           
+                              
+
+    }else{
+    
+    let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i)
+    let colorfn = colorFn(uniqueV.map((d,i)=>i))
+
+      dataset.forEach((e,index)=>{
+        ctx.fillStyle = e?colorfn(uniqueV.indexOf(e)):'#ffffff'
+        ctx.fillRect(xScale(index),0,bandwidth,height)   
+      })   
     }
 }
 
 
 
-//get attrTable
-export var pivotData = data => {
-        let frame = {...d3.range(data.length).map((d)=>null)}
-        return data.reduce((acc,d,index)=>{
 
-        Object.keys(d).forEach((k)=>{
-            if (!acc.hasOwnProperty(k))acc[k]={...frame}
-            acc[k][index]=d[k]  
-        })
-        return acc;
-    },{})
+//get attrTable
+// export var pivotData = data => {
+//         let frame = {...d3.range(data.length).map((d)=>null)}
+//         return data.reduce((acc,d,index)=>{
+
+//         Object.keys(d).forEach((k)=>{
+//             if (!acc.hasOwnProperty(k))acc[k]={...frame}
+//             acc[k][index]=d[k]  
+//         })
+//         return acc;
+//     },{})
+//    }
+
+var pivotData = data => data.reduce((acc,d)=>{
+          let diff = Object.keys(d).filter((a)=>acc.keys.indexOf(a)===-1);
+          
+          if(diff.length>0){
+            acc.keys = [...acc.keys,...diff];
+            acc.values = [...acc.values,...diff.map((a)=>data.map((d)=>d[a]))];
+          }
+          return acc;   
+        },{keys:[],values:[]})
+
+export var sort2D=function(aa,rowid,fn){
+      let newindex = aa[rowid].map((value,index)=>({index,value})).sort((a,b)=>fn(a.value,b.value)).map((d)=>d.index)
+      return aa.map((a)=>newindex.map((i)=>a[i]))
    }
 

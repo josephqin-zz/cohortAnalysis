@@ -33,7 +33,7 @@ renderModule.setContainer = function(data){
 
 renderModule.bindData = function(data){
 	if(!arguments.length) return dataset;
-	dataset = pivotData(data);
+	dataset = data;
 	return this;
 }
 

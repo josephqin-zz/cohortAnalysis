@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<script src='http://d3js.org/d3.v4.js'></script>
+		<!-- <script src='http://d3js.org/d3.v4.js'></script> -->
 		<script src="test.js"></script>
 		<script src="../build/myCode.js"></script>
 		
@@ -12,17 +12,26 @@
 	</body>
 	<script>
     
-    var pivotData = data => {
-    	let frame = {...d3.range(data.length).map((d)=>null)}
-    	console.log(frame)
-    	return data.reduce((acc,d,index)=>{
+    var pivotData = data => data.reduce((acc,d)=>{
+          let diff = Object.keys(d).filter((a)=>acc.keys.indexOf(a)===-1);
+          
+          if(diff.length>0){
+          	acc.keys = [...acc.keys,...diff];
+          	acc.values = [...acc.values,...diff.map((a)=>data.map((d)=>d[a]))];
+          }
+          return acc;   
+        },{keys:[],values:[]})
+        
+   
 
-    	Object.keys(d).forEach((k)=>{
-        	if (!acc.hasOwnProperty(k))acc[k]={...frame}
-        	acc[k][index]=d[k]	
-        })
-        return acc;
-    },{})
+   
+
+
+   aa = [[1,2,3],[16,15,14],[5,8,2]]
+
+   function sort2D(aa,rowid,fn){
+   		let newindex = aa[rowid].map((value,index)=>({index,value})).sort((a,b)=>fn(a.value,b.value)).map((d)=>d.index)
+   		return aa.map((a)=>newindex.map((i)=>a[i]))
    }
 
   
