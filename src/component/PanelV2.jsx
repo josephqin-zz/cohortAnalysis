@@ -4,6 +4,9 @@ import * as utility from '../utility'
 const textStyle = {textAnchor:'start',dominantBaseline:'middle',fill:'#000000',fontSize:'1em'};
 const lineStyle = {strokeWidth:'1px',fill:'none'}
 const rectStyle = {stroke:'none'}
+const panelStyle = {paddingTop:'5px'}
+const controlStyle = {width:'300px',position:'absolute'}
+const canvasStyle = {position:'absolute'}
 
 const Plot = function(props){
     const lines = utility.createLine(props.data,props.width,props.height).map((line,index)=>(<path key={index} {...line} />))
@@ -43,12 +46,17 @@ class Canvas extends React.Component{
 
 
 const Row = function(props){
-   
+
     return(
-        <div>
-            <h3 onClick={()=>props.sortFn(props.text)} >{ props.text }</h3>
+        <div height={props.height}>
+         
             {/*<Plot data={props.data} width={props.width} height={props.height}/>*/}
-            <Canvas data={props.data} width={props.width} height={props.height}/>
+            <div style={canvasStyle}>
+                <Canvas data={props.data} width={props.width} height={props.height}/>
+            </div>
+            <div style={{left:props.width,position:'relative'}}>
+                <h3 onClick={()=>props.sortFn(props.text)} >{ props.text }</h3>
+            </div>
         </div>
         )
 }

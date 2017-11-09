@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<!-- <script src='http://d3js.org/d3.v4.js'></script> -->
+		<script src='http://d3js.org/d3.v4.js'></script>
 		<script src="test.js"></script>
 		<script src="../build/myCode.js"></script>
 		
@@ -23,8 +23,9 @@
         },{keys:[],values:[]})
         
    
-
-   
+    var test = pivotData(dataset.samples);
+    pfn = Panel.bindData(test).setContainer("container")
+    pfn()
 
 
    aa = [[1,2,3],[16,15,14],[5,8,2]]

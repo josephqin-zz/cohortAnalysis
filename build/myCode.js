@@ -11400,7 +11400,7 @@ module.exports = lowPriorityWarning;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 exports.sort2D = exports.canvasDraw = exports.createLine = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
 
@@ -11418,122 +11418,122 @@ var lineStyle = { strokeWidth: '1px', fill: 'none' };
 var rectStyle = { stroke: 'none' };
 
 var tranSlate = exports.tranSlate = function tranSlate(x, y) {
-  return 'translate(' + x + ',' + y + ')';
+    return 'translate(' + x + ',' + y + ')';
 };
 var drawCircle = exports.drawCircle = function drawCircle(radius) {
-  return 'M ' + (0 - radius) + ' ' + 0 + ' a ' + radius + ' ' + radius + ', 0, 1, 0, ' + radius * 2 + ' ' + 0 + ' ' + 'a ' + radius + ' ' + radius + ', 0, 1, 0, ' + -radius * 2 + ' ' + 0;
+    return 'M ' + (0 - radius) + ' ' + 0 + ' a ' + radius + ' ' + radius + ', 0, 1, 0, ' + radius * 2 + ' ' + 0 + ' ' + 'a ' + radius + ' ' + radius + ', 0, 1, 0, ' + -radius * 2 + ' ' + 0;
 };
 var drawRect = exports.drawRect = function drawRect(width, height) {
-  var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-  var y = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-  return 'M' + (x - width / 2) + ',' + (y - height / 2) + ' h ' + width + ' v ' + height + ' h ' + (0 - width) + ' Z ';
+    var x = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var y = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+    return 'M' + (x - width / 2) + ',' + (y - height / 2) + ' h ' + width + ' v ' + height + ' h ' + (0 - width) + ' Z ';
 };
 var drawLine = exports.drawLine = function drawLine(sourse, target) {
-  return 'M' + sourse.x + ',' + sourse.y + ' L ' + target.x + ',' + target.y;
+    return 'M' + sourse.x + ',' + sourse.y + ' L ' + target.x + ',' + target.y;
 };
 
 //oldRange,Maxlines,step => newRange
 var pagination = exports.pagination = function pagination(oldRange, boundry, step) {
-  return oldRange.length < boundry && oldRange[0] + step >= 0 && oldRange[oldRange.length - 1] + step <= boundry ? oldRange.map(function (d) {
-    return d + step;
-  }) : oldRange;
+    return oldRange.length < boundry && oldRange[0] + step >= 0 && oldRange[oldRange.length - 1] + step <= boundry ? oldRange.map(function (d) {
+        return d + step;
+    }) : oldRange;
 };
 var createArray = exports.createArray = d3.range;
 
 //dendrogram
 var dendrogram = exports.dendrogram = function dendrogram(data, width, height) {
-  var root = d3.hierarchy(data);
-  var cluster = d3.cluster().size([width, height]).separation(function (a, b) {
-    return a.parent == b.parent ? 1 : 1;
-  });
-  cluster(root);
-  return root;
+    var root = d3.hierarchy(data);
+    var cluster = d3.cluster().size([width, height]).separation(function (a, b) {
+        return a.parent == b.parent ? 1 : 1;
+    });
+    cluster(root);
+    return root;
 };
 
 //draw the links from parent to children
 var drawBraceLine = exports.drawBraceLine = function drawBraceLine(node, nodes) {
-  return drawLine({ y: node.y, x: d3.max(nodes.map(function (d) {
-      return d.x;
-    })) }, { y: node.y, x: d3.min(nodes.map(function (d) {
-      return d.x;
-    })) }) + nodes.map(function (d) {
-    return drawLine({ y: node.y, x: d.x }, d);
-  }).join('');
+    return drawLine({ y: node.y, x: d3.max(nodes.map(function (d) {
+            return d.x;
+        })) }, { y: node.y, x: d3.min(nodes.map(function (d) {
+            return d.x;
+        })) }) + nodes.map(function (d) {
+        return drawLine({ y: node.y, x: d.x }, d);
+    }).join('');
 };
 
 //scaleBand
 var scaleBand = exports.scaleBand = function scaleBand(range, domain) {
-  return d3.scaleBand.range(range).domain(domain);
+    return d3.scaleBand.range(range).domain(domain);
 };
 
 var colorFn = exports.colorFn = function colorFn(values) {
-  return d3.scaleSequential().domain([d3.max(values), d3.min(values)]).interpolator(d3.interpolateWarm);
+    return d3.scaleSequential().domain([d3.max(values), d3.min(values)]).interpolator(d3.interpolateWarm);
 };
 
 var createLine = exports.createLine = function createLine(dataset, width, height) {
 
-  var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
-  var bandwidth = xScale.bandwidth();
-  if (dataset.map(function (v) {
-    return typeof v === 'undefined' ? 'undefined' : _typeof(v);
-  }).includes('number')) {
+    var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
+    var bandwidth = xScale.bandwidth();
+    if (dataset.map(function (v) {
+        return typeof v === 'undefined' ? 'undefined' : _typeof(v);
+    }).includes('number')) {
 
-    var yScale = d3.scaleLinear().range([height, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
-    var lineFunction = d3.line().x(function (d, index) {
-      return xScale(index) + bandwidth * 0.5;
-    }).y(function (d) {
-      return d ? yScale(d) : yScale(0);
-    }).curve(d3.curveMonotoneX);
-    return [Object.assign({ d: lineFunction(dataset), stroke: '#000000' }, lineStyle)];
-  } else {
+        var yScale = d3.scaleLinear().range([height, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
+        var lineFunction = d3.line().x(function (d, index) {
+            return xScale(index) + bandwidth * 0.5;
+        }).y(function (d) {
+            return d ? yScale(d) : yScale(0);
+        }).curve(d3.curveMonotoneX);
+        return [Object.assign({ d: lineFunction(dataset), stroke: '#000000' }, lineStyle)];
+    } else {
 
-    var uniqueV = dataset.filter(function (d, i, self) {
-      return self.indexOf(d) === i;
-    });
-    var colorfn = colorFn(uniqueV.map(function (d, i) {
-      return i;
-    }));
+        var uniqueV = dataset.filter(function (d, i, self) {
+            return self.indexOf(d) === i;
+        });
+        var colorfn = colorFn(uniqueV.map(function (d, i) {
+            return i;
+        }));
 
-    return dataset.map(function (e, index) {
-      return Object.assign({ d: drawRect(bandwidth, height, xScale(index) + bandwidth * 0.5, height * 0.5), fill: e ? colorfn(uniqueV.indexOf(e)) : '#ffffff' }, rectStyle);
-    });
-  }
+        return dataset.map(function (e, index) {
+            return Object.assign({ d: drawRect(bandwidth, height, xScale(index) + bandwidth * 0.5, height * 0.5), fill: e ? colorfn(uniqueV.indexOf(e)) : '#ffffff' }, rectStyle);
+        });
+    }
 };
 
 //canvas draw
 var canvasDraw = exports.canvasDraw = function canvasDraw(ctx, dataset, width, height) {
 
-  var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
-  var bandwidth = xScale.bandwidth();
-  if (dataset.map(function (v) {
-    return typeof v === 'undefined' ? 'undefined' : _typeof(v);
-  }).includes('number')) {
+    var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
+    var bandwidth = xScale.bandwidth();
+    if (dataset.map(function (v) {
+        return typeof v === 'undefined' ? 'undefined' : _typeof(v);
+    }).includes('number')) {
 
-    var yScale = d3.scaleLinear().range([height - 5, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
-    var lineFunction = d3.line().x(function (d, index) {
-      return xScale(index);
-    }).y(function (d) {
-      return d ? yScale(d) : yScale(0);
-    }).curve(d3.curveMonotoneX).context(ctx);
-    ctx.beginPath();
-    lineFunction(dataset);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "steelblue";
-    ctx.stroke();
-  } else {
+        var yScale = d3.scaleLinear().range([height - 5, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
+        var lineFunction = d3.line().x(function (d, index) {
+            return xScale(index);
+        }).y(function (d) {
+            return d ? yScale(d) : yScale(0);
+        }).curve(d3.curveMonotoneX).context(ctx);
+        ctx.beginPath();
+        lineFunction(dataset);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "steelblue";
+        ctx.stroke();
+    } else {
 
-    var uniqueV = dataset.filter(function (d, i, self) {
-      return self.indexOf(d) === i;
-    });
-    var colorfn = colorFn(uniqueV.map(function (d, i) {
-      return i;
-    }));
+        var uniqueV = dataset.filter(function (d, i, self) {
+            return self.indexOf(d) === i;
+        });
+        var colorfn = colorFn(uniqueV.map(function (d, i) {
+            return i;
+        }));
 
-    dataset.forEach(function (e, index) {
-      ctx.fillStyle = e ? colorfn(uniqueV.indexOf(e)) : '#ffffff';
-      ctx.fillRect(xScale(index), 0, bandwidth, height);
-    });
-  }
+        dataset.forEach(function (e, index) {
+            ctx.fillStyle = e ? colorfn(uniqueV.indexOf(e)) : '#ffffff';
+            ctx.fillRect(xScale(index), 0, bandwidth, height);
+        });
+    }
 };
 
 //get attrTable
@@ -11550,36 +11550,36 @@ var canvasDraw = exports.canvasDraw = function canvasDraw(ctx, dataset, width, h
 //    }
 
 var pivotData = function pivotData(data) {
-  return data.reduce(function (acc, d) {
-    var diff = Object.keys(d).filter(function (a) {
-      return acc.keys.indexOf(a) === -1;
-    });
-
-    if (diff.length > 0) {
-      acc.keys = [].concat(_toConsumableArray(acc.keys), _toConsumableArray(diff));
-      acc.values = [].concat(_toConsumableArray(acc.values), _toConsumableArray(diff.map(function (a) {
-        return data.map(function (d) {
-          return d[a];
+    return data.reduce(function (acc, d) {
+        var diff = Object.keys(d).filter(function (a) {
+            return acc.keys.indexOf(a) === -1;
         });
-      })));
-    }
-    return acc;
-  }, { keys: [], values: [] });
+
+        if (diff.length > 0) {
+            acc.keys = [].concat(_toConsumableArray(acc.keys), _toConsumableArray(diff));
+            acc.values = [].concat(_toConsumableArray(acc.values), _toConsumableArray(diff.map(function (a) {
+                return data.map(function (d) {
+                    return d[a];
+                });
+            })));
+        }
+        return acc;
+    }, { keys: [], values: [] });
 };
 
 var sort2D = exports.sort2D = function sort2D(aa, rowid, fn) {
-  var newindex = aa[rowid].map(function (value, index) {
-    return { index: index, value: value };
-  }).sort(function (a, b) {
-    return fn(a.value, b.value);
-  }).map(function (d) {
-    return d.index;
-  });
-  return aa.map(function (a) {
-    return newindex.map(function (i) {
-      return a[i];
+    var newindex = aa[rowid].map(function (value, index) {
+        return { index: index, value: value };
+    }).sort(function (a, b) {
+        return fn(a.value, b.value);
+    }).map(function (d) {
+        return d.index;
     });
-  });
+    return aa.map(function (a) {
+        return newindex.map(function (i) {
+            return a[i];
+        });
+    });
 };
 
 /***/ }),
@@ -19066,6 +19066,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var textStyle = { textAnchor: 'start', dominantBaseline: 'middle', fill: '#000000', fontSize: '1em' };
 var lineStyle = { strokeWidth: '1px', fill: 'none' };
 var rectStyle = { stroke: 'none' };
+var panelStyle = { paddingTop: '5px' };
+var controlStyle = { width: '300px', position: 'absolute' };
+var canvasStyle = { position: 'absolute' };
 
 var Plot = function Plot(props) {
     var lines = utility.createLine(props.data, props.width, props.height).map(function (line, index) {
@@ -19122,15 +19125,23 @@ var Row = function Row(props) {
 
     return _react2.default.createElement(
         'div',
-        null,
+        { height: props.height },
         _react2.default.createElement(
-            'h3',
-            { onClick: function onClick() {
-                    return props.sortFn(props.text);
-                } },
-            props.text
+            'div',
+            { style: canvasStyle },
+            _react2.default.createElement(Canvas, { data: props.data, width: props.width, height: props.height })
         ),
-        _react2.default.createElement(Canvas, { data: props.data, width: props.width, height: props.height })
+        _react2.default.createElement(
+            'div',
+            { style: { left: props.width, position: 'relative' } },
+            _react2.default.createElement(
+                'h3',
+                { onClick: function onClick() {
+                        return props.sortFn(props.text);
+                    } },
+                props.text
+            )
+        )
     );
 };
 
