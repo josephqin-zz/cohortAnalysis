@@ -19066,9 +19066,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var textStyle = { textAnchor: 'start', dominantBaseline: 'middle', fill: '#000000', fontSize: '1em' };
 var lineStyle = { strokeWidth: '1px', fill: 'none' };
 var rectStyle = { stroke: 'none' };
-var panelStyle = { paddingTop: '5px' };
-var controlStyle = { width: '300px', position: 'absolute' };
-var canvasStyle = { position: 'absolute' };
+var panelStyle = { marginTop: '5px', padding: '2px', backgroundColor: '#f2f2f2' };
+var canvasStyle = { float: 'left' };
 
 var Plot = function Plot(props) {
     var lines = utility.createLine(props.data, props.width, props.height).map(function (line, index) {
@@ -19121,40 +19120,56 @@ var Canvas = function (_React$Component) {
     return Canvas;
 }(_react2.default.Component);
 
-var Row = function Row(props) {
+var Row = function (_React$Component2) {
+    _inherits(Row, _React$Component2);
 
-    return _react2.default.createElement(
-        'div',
-        { height: props.height },
-        _react2.default.createElement(
-            'div',
-            { style: canvasStyle },
-            _react2.default.createElement(Canvas, { data: props.data, width: props.width, height: props.height })
-        ),
-        _react2.default.createElement(
-            'div',
-            { style: { left: props.width, position: 'relative' } },
-            _react2.default.createElement(
-                'h3',
-                { onClick: function onClick() {
-                        return props.sortFn(props.text);
-                    } },
-                props.text
-            )
-        )
-    );
-};
+    function Row(props) {
+        _classCallCheck(this, Row);
 
-var Panel = function (_React$Component2) {
-    _inherits(Panel, _React$Component2);
+        return _possibleConstructorReturn(this, (Row.__proto__ || Object.getPrototypeOf(Row)).call(this, props));
+    }
+
+    _createClass(Row, [{
+        key: 'render',
+        value: function render() {
+            var _this4 = this;
+
+            return _react2.default.createElement(
+                'div',
+                { style: panelStyle },
+                _react2.default.createElement(
+                    'div',
+                    { style: canvasStyle },
+                    _react2.default.createElement(Canvas, { data: this.props.data, width: this.props.width, height: this.props.height })
+                ),
+                _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                        'h3',
+                        { onClick: function onClick() {
+                                return _this4.props.sortFn(_this4.props.text);
+                            } },
+                        this.props.text
+                    )
+                )
+            );
+        }
+    }]);
+
+    return Row;
+}(_react2.default.Component);
+
+var Panel = function (_React$Component3) {
+    _inherits(Panel, _React$Component3);
 
     function Panel(props) {
         _classCallCheck(this, Panel);
 
-        var _this3 = _possibleConstructorReturn(this, (Panel.__proto__ || Object.getPrototypeOf(Panel)).call(this, props));
+        var _this5 = _possibleConstructorReturn(this, (Panel.__proto__ || Object.getPrototypeOf(Panel)).call(this, props));
 
-        _this3.state = { order: 0 };
-        return _this3;
+        _this5.state = { order: 0 };
+        return _this5;
     }
 
     _createClass(Panel, [{
@@ -19166,14 +19181,14 @@ var Panel = function (_React$Component2) {
     }, {
         key: 'render',
         value: function render() {
-            var _this4 = this;
+            var _this6 = this;
 
             var dataset = utility.sort2D(this.props.data.values, this.state.order, function (a, b) {
                 return b - a;
             });
 
             var rows = dataset.map(function (entry, index) {
-                return _react2.default.createElement(Row, { key: index, text: _this4.props.data.keys[index], data: entry, width: _this4.props.width, height: _this4.props.height / _this4.props.data.keys.length, sortFn: _this4.sortHandler.bind(_this4) });
+                return _react2.default.createElement(Row, { key: index, text: _this6.props.data.keys[index], data: entry, width: _this6.props.width, height: 60, sortFn: _this6.sortHandler.bind(_this6) });
             });
 
             return _react2.default.createElement(
