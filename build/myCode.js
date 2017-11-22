@@ -11402,7 +11402,7 @@ module.exports = lowPriorityWarning;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.sort2D = exports.canvasDraw = exports.createLine = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
+exports.sort2D = exports.canvasDrawV2 = exports.canvasDraw = exports.createLine = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -11534,6 +11534,38 @@ var canvasDraw = exports.canvasDraw = function canvasDraw(ctx, dataset, width, h
             ctx.fillRect(xScale(index), 0, bandwidth, height);
         });
     }
+};
+
+var canvasDrawV2 = exports.canvasDrawV2 = function canvasDrawV2(ctx, dataset, width, height) {
+
+    var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
+    var bandwidth = xScale.bandwidth();
+    var yScale = function yScale(d) {
+        return height;
+    };
+    var colorfn = function colorfn(d) {
+        return 'steelblue';
+    };
+    if (dataset.map(function (v) {
+        return typeof v === 'undefined' ? 'undefined' : _typeof(v);
+    }).includes('number')) {
+
+        yScale = d3.scaleLinear().range([height - 5, 0]).domain([d3.min(dataset), d3.max(dataset)]).nice();
+    } else {
+        var uniqueV = dataset.filter(function (d, i, self) {
+            return self.indexOf(d) === i;
+        });
+        var cfn = colorFn(uniqueV.map(function (d, i) {
+            return i;
+        }));
+        colorfn = function colorfn(e) {
+            return e ? cfn(uniqueV.indexOf(e)) : '#ffffff';
+        };
+    }
+    dataset.forEach(function (e, index) {
+        ctx.fillStyle = colorfn(e);
+        ctx.fillRect(xScale(index), height, bandwidth, -yScale(e));
+    });
 };
 
 //get attrTable
@@ -19066,7 +19098,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var textStyle = { textAnchor: 'start', dominantBaseline: 'middle', fill: '#000000', fontSize: '1em' };
 var lineStyle = { strokeWidth: '1px', fill: 'none' };
 var rectStyle = { stroke: 'none' };
-var panelStyle = { marginTop: '5px', padding: '2px', backgroundColor: '#f2f2f2' };
+var panelStyle = { marginTop: '5px', padding: '2px', backgroundColor: '#f0f0f5' };
 var canvasStyle = { float: 'left' };
 
 var Plot = function Plot(props) {
@@ -19104,7 +19136,7 @@ var Canvas = function (_React$Component) {
         value: function updateCanvas() {
             var ctx = this.canvas.getContext('2d');
             ctx.clearRect(0, 0, this.props.width, this.props.height);
-            utility.canvasDraw(ctx, this.props.data, this.props.width, this.props.height);
+            utility.canvasDrawV2(ctx, this.props.data, this.props.width, this.props.height);
         }
     }, {
         key: 'render',

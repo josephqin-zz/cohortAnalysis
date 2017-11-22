@@ -4,14 +4,14 @@ import * as utility from '../utility'
 const textStyle = {textAnchor:'start',dominantBaseline:'middle',fill:'#000000',fontSize:'1em'};
 const lineStyle = {strokeWidth:'1px',fill:'none'}
 const rectStyle = {stroke:'none'}
-const panelStyle ={marginTop:'5px',padding:'2px',backgroundColor:'#f2f2f2'}
+const panelStyle ={marginTop:'5px',padding:'2px',backgroundColor:'#f0f0f5'}
 const canvasStyle ={float:'left'}
 
 const Plot = function(props){
     const lines = utility.createLine(props.data,props.width,props.height).map((line,index)=>(<path key={index} {...line} />))
     return (
         <svg width={props.width} height={props.height}>
-            { lines }
+            { lines }  
         </svg>
         )
 }
@@ -33,7 +33,7 @@ class Canvas extends React.Component{
     updateCanvas() {
         const ctx = this.canvas.getContext('2d');
         ctx.clearRect(0, 0, this.props.width, this.props.height);
-        utility.canvasDraw(ctx,this.props.data,this.props.width,this.props.height);
+        utility.canvasDrawV2(ctx,this.props.data,this.props.width,this.props.height);
     }
     
     render(){

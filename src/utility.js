@@ -87,6 +87,32 @@ export var canvasDraw = function(ctx,dataset,width,height){
 }
 
 
+export var canvasDrawV2 = function(ctx,dataset,width,height){
+    
+    let xScale = d3.scaleBand().range([0,width]).domain(d3.range(dataset.length));
+    let bandwidth = xScale.bandwidth();
+    let yScale = (d) => height;
+    let colorfn = (d)=> 'steelblue';
+    if(dataset.map((v)=>typeof v).includes('number')){
+
+    
+    yScale = d3.scaleLinear().range([height-5,0]).domain([d3.min(dataset),d3.max(dataset)]).nice();
+   
+                              
+
+    }else{
+     let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i)
+     let cfn = colorFn(uniqueV.map((d,i)=>i))
+     colorfn = (e) => e?cfn(uniqueV.indexOf(e)):'#ffffff'
+    }
+      dataset.forEach((e,index)=>{
+        ctx.fillStyle = colorfn(e);
+        ctx.fillRect(xScale(index),height,bandwidth,-yScale(e))   
+      })   
+    
+}
+
+
 
 
 //get attrTable
