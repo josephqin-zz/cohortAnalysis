@@ -11,7 +11,16 @@
 
 	</body>
 	<script>
-    
+
+    const {samples,values} = dataset
+
+    var sampleMap=samples.reduce((acc,s)=>{
+      let {cell_name,reagent,stime,complex,sample_id} = s;
+      acc[sample_id]={cell_name,reagent,stime,complex}
+      return acc;
+    },{})
+    var newdataset = values.map((v)=>({...v,...sampleMap[v.sample_id]}))
+      console.log(newdataset);
     var pivotData = data => data.reduce((acc,d)=>{
           let diff = Object.keys(d).filter((a)=>acc.keys.indexOf(a)===-1);
           
@@ -23,7 +32,7 @@
         },{keys:[],values:[]})
         
    
-    var test = pivotData(dataset.samples);
+    var test = pivotData(newdataset);
     pfn = Panel.bindData(test).setContainer("container")
     pfn()
 

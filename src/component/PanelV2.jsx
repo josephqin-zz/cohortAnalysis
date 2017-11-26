@@ -43,6 +43,20 @@ class Canvas extends React.Component{
     }
 }
 
+class Infopanel extends React.Component{
+   constructor(props){
+        super(props);
+    }
+   
+   render(){
+      return (
+        <div>
+            <h3>{this.props.text}</h3>
+        </div>
+        )
+   }
+
+}
 
 class Row extends React.Component{
     constructor(props){
@@ -56,9 +70,7 @@ class Row extends React.Component{
             <div style={canvasStyle}>
                 <Canvas data={this.props.data} width={this.props.width} height={this.props.height}/>
             </div>
-            <div >
-                <h3 onClick={()=>this.props.sortFn(this.props.text)} >{ this.props.text }</h3>
-            </div>
+            <Infopanel text={this.props.text} />
             {/*<Plot data={props.data} width={props.width} height={props.height}/>*/}
             
         </div>

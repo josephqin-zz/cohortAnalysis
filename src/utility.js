@@ -28,6 +28,8 @@ export var scaleBand = (range,domain)=>d3.scaleBand.range(range).domain(domain)
 
 export var colorFn = (values)=>d3.scaleSequential().domain([d3.max(values),d3.min(values)]).interpolator(d3.interpolateWarm)
 
+export var colorMap = (length)=> (index)=> index>=0?d3.scaleSequential(d3.interpolateRainbow)(index/length):'#ffffff'
+
 
 export var createLine = function(dataset,width,height){
     
@@ -46,7 +48,7 @@ export var createLine = function(dataset,width,height){
 
     }else{
     
-    let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i)
+    let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i && d)
     let colorfn = colorFn(uniqueV.map((d,i)=>i))
 
     return dataset.map((e,index)=>(Object.assign({d:drawRect(bandwidth,height,xScale(index)+bandwidth*0.5,height*0.5),fill:e?colorfn(uniqueV.indexOf(e)):'#ffffff'},rectStyle)))   
@@ -101,9 +103,9 @@ export var canvasDrawV2 = function(ctx,dataset,width,height){
                               
 
     }else{
-     let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i)
-     let cfn = colorFn(uniqueV.map((d,i)=>i))
-     colorfn = (e) => e?cfn(uniqueV.indexOf(e)):'#ffffff'
+     let uniqueV = dataset.filter((d,i,self)=>self.indexOf(d)===i && d)
+     let cfn = colorMap(uniqueV.length)
+     colorfn = (e) => cfn(uniqueV.indexOf(e))
     }
       dataset.forEach((e,index)=>{
         ctx.fillStyle = colorfn(e);
@@ -112,6 +114,54 @@ export var canvasDrawV2 = function(ctx,dataset,width,height){
     
 }
 
+
+export var canvasDrawV3 = function(ctx,dataset,width,height,metaData){
+    
+    let xScale = d3.scaleBand().range([0,width]).domain(d3.range(dataset.length));
+    let bandwidth = xScale.bandwidth();
+     let yScale = (d) => height;
+    let colorfn = (d)=> 'steelblue';
+    if(metaData.type === 'number'){
+
+    
+    yScale = d3.scaleLinear().range([height-5,0]).domain(metaData.range).nice();
+    let lineFunction = d3.line()
+                               .x((d,index)=> xScale(index))
+                               .y((d)=>d?yScale(d):yScale(0))
+                               .curve(d3.curveMonotoneX)
+                               .context(ctx);
+    ctx.beginPath();
+    lineFunction(dataset); 
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "steelblue";
+    ctx.stroke();
+    
+                              
+
+    }else{
+     
+     let cfn = colorMap(metaData.range.length)
+     colorfn = (e) => cfn(metaData.range.indexOf(e))
+     dataset.forEach((e,index)=>{
+        ctx.fillStyle = colorfn(e);
+        ctx.fillRect(xScale(index),0,bandwidth,height)
+     }) 
+    }
+        
+    
+}
+
+export var getDatainfo = function(dataset){
+  if(dataset.every((v)=>typeof v ==='number')){
+  
+    return {type:'number',range:[d3.min(dataset),d3.max(dataset)]}
+  
+  }else{
+    
+    return {type:'string',range: dataset.filter((d,i,self)=>self.indexOf(d)===i && d)}
+  }
+
+}
 
 
 
