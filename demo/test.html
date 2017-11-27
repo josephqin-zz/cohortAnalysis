@@ -20,25 +20,38 @@
       return acc;
     },{})
     var newdataset = values.map((v)=>({...v,...sampleMap[v.sample_id]}))
-      console.log(newdataset);
+    
+    var getDatainfo = function(attr,dataset){
+      if(dataset.every((v)=>typeof v ==='number')){
+      
+        return {name:attr,values:dataset,type:'number',range:[d3.min(dataset),d3.max(dataset)]}
+      
+      }else{
+        
+        return {name:attr,values:dataset,type:'string',range:dataset.filter((d,i,self)=>self.indexOf(d)===i && d)}
+      }
+
+    }
+
     var pivotData = data => data.reduce((acc,d)=>{
-          let diff = Object.keys(d).filter((a)=>acc.keys.indexOf(a)===-1);
-          
+          let diff = Object.keys(d).filter((a)=>acc.map(d=>d.name).indexOf(a)===-1);
           if(diff.length>0){
-          	acc.keys = [...acc.keys,...diff];
-          	acc.values = [...acc.values,...diff.map((a)=>data.map((d)=>d[a]))];
+            return [...acc,...diff.map((a)=>getDatainfo(a,data.map((d)=>d[a])))]
           }
-          return acc;   
-        },{keys:[],values:[]})
+          else{
+            return acc;
+          }
+        },[])
         
    
-    var test = pivotData(newdataset);
+    var test = pivotData(newdataset.filter((d)=>d.cell_name==='MOLM13' && d.reagent==='DMSO' && ['L-Arginine','D-Ribitol','3-Hydroxymethylglutaric acid'].includes(d.compound)));
+    console.log(test);
     pfn = Panel.bindData(test).setContainer("container")
     pfn()
 
 
-   aa = [[1,2,3],[16,15,14],[5,8,2]]
-
+   // aa = [[1,2,3],[16,15,14],[5,8,2]]
+  
    function sort2D(aa,rowid,fn){
    		let newindex = aa[rowid].map((value,index)=>({index,value})).sort((a,b)=>fn(a.value,b.value)).map((d)=>d.index)
    		return aa.map((a)=>newindex.map((i)=>a[i]))

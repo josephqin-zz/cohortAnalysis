@@ -11412,7 +11412,7 @@ module.exports = lowPriorityWarning;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.sort2D = exports.getDatainfo = exports.canvasDrawV3 = exports.canvasDrawV2 = exports.canvasDraw = exports.createLine = exports.colorMap = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
+exports.getSortIndex = exports.sort2D = exports.getDatainfo = exports.canvasDrawV3 = exports.canvasDrawV2 = exports.canvasDraw = exports.createLine = exports.colorMap = exports.colorFn = exports.scaleBand = exports.drawBraceLine = exports.dendrogram = exports.createArray = exports.pagination = exports.drawLine = exports.drawRect = exports.drawCircle = exports.tranSlate = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -11582,7 +11582,7 @@ var canvasDrawV2 = exports.canvasDrawV2 = function canvasDrawV2(ctx, dataset, wi
     });
 };
 
-var canvasDrawV3 = exports.canvasDrawV3 = function canvasDrawV3(ctx, dataset, width, height, metaData) {
+var canvasDrawV3 = exports.canvasDrawV3 = function canvasDrawV3(ctx, dataset, width, height, dataType, dataRange) {
 
     var xScale = d3.scaleBand().range([0, width]).domain(d3.range(dataset.length));
     var bandwidth = xScale.bandwidth();
@@ -11592,9 +11592,9 @@ var canvasDrawV3 = exports.canvasDrawV3 = function canvasDrawV3(ctx, dataset, wi
     var colorfn = function colorfn(d) {
         return 'steelblue';
     };
-    if (metaData.type === 'number') {
+    if (dataType === 'number') {
 
-        yScale = d3.scaleLinear().range([height - 5, 0]).domain(metaData.range).nice();
+        yScale = d3.scaleLinear().range([height - 5, 0]).domain(dataRange).nice();
         var lineFunction = d3.line().x(function (d, index) {
             return xScale(index);
         }).y(function (d) {
@@ -11607,9 +11607,9 @@ var canvasDrawV3 = exports.canvasDrawV3 = function canvasDrawV3(ctx, dataset, wi
         ctx.stroke();
     } else {
 
-        var cfn = colorMap(metaData.range.length);
+        var cfn = colorMap(dataRange.length);
         colorfn = function colorfn(e) {
-            return cfn(metaData.range.indexOf(e));
+            return cfn(dataRange.indexOf(e));
         };
         dataset.forEach(function (e, index) {
             ctx.fillStyle = colorfn(e);
@@ -11675,6 +11675,22 @@ var sort2D = exports.sort2D = function sort2D(aa, rowid, fn) {
         return newindex.map(function (i) {
             return a[i];
         });
+    });
+};
+
+var getSortIndex = exports.getSortIndex = function getSortIndex(entry) {
+    return entry.type === 'number' ? entry.values.map(function (value, index) {
+        return { index: index, value: value };
+    }).sort(function (a, b) {
+        return a.value - b.value;
+    }).map(function (d) {
+        return d.index;
+    }) : entry.values.map(function (value, index) {
+        return { index: index, value: value };
+    }).sort(function (a, b) {
+        return entry.range.indexOf(a.value) - entry.range.indexOf(b.value);
+    }).map(function (d) {
+        return d.index;
     });
 };
 
@@ -19196,7 +19212,7 @@ var Canvas = function (_React$Component) {
         value: function updateCanvas() {
             var ctx = this.canvas.getContext('2d');
             ctx.clearRect(0, 0, this.props.width, this.props.height);
-            utility.canvasDrawV3(ctx, this.props.data, this.props.width, this.props.height, this.props.metaData);
+            utility.canvasDrawV3(ctx, this.props.data, this.props.width, this.props.height, this.props.dataType, this.props.dataRange);
         }
     }, {
         key: 'render',
@@ -19222,49 +19238,6 @@ var Infopanel = function (_React$Component2) {
     }
 
     _createClass(Infopanel, [{
-        key: 'activeSort',
-        value: function activeSort() {
-            var _props = this.props,
-                data = _props.data,
-                metaData = _props.metaData,
-                sortFn = _props.sortFn;
-
-            var sortIndex = data.map(function (d, index) {
-                return index;
-            });
-            if (metaData.type === 'number') {
-                sortIndex = data.map(function (value, index) {
-                    return { index: index, value: value };
-                }).sort(function (a, b) {
-                    return a.value - b.value;
-                }).map(function (d) {
-                    return d.index;
-                });
-            } else {
-                sortIndex = data.map(function (value, index) {
-                    return { index: index, value: value };
-                }).sort(function (a, b) {
-                    return metaData.range.indexOf(a.value) - metaData.range.indexOf(b.value);
-                }).map(function (d) {
-                    return d.index;
-                });
-            }
-
-            sortFn(sortIndex);
-        }
-    }, {
-        key: 'selectedHandler',
-        value: function selectedHandler(valueData) {
-
-            this.props.filterFn(this.props.data.map(function (value, index) {
-                return { index: index, value: value };
-            }).filter(function (d) {
-                return d.value === valueData;
-            }).map(function (d) {
-                return d.index;
-            }));
-        }
-    }, {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
@@ -19280,10 +19253,15 @@ var Infopanel = function (_React$Component2) {
                     ),
                     _react2.default.createElement(
                         'button',
-                        { onClick: this.activeSort.bind(this) },
+                        { onClick: this.props.sortFn },
                         'sort'
                     ),
-                    this.props.metaData.type !== 'number' && _react2.default.createElement(_Selection2.default, { options: this.props.metaData.range, selectedHandler: this.selectedHandler.bind(this) })
+                    this.props.dataType !== 'number' && _react2.default.createElement(_Selection2.default, { options: this.props.dataRange }),
+                    _react2.default.createElement(
+                        'button',
+                        { onClick: this.props.removeFn },
+                        'remove'
+                    )
                 )
             );
         }
@@ -19304,23 +19282,16 @@ var Row = function (_React$Component3) {
     _createClass(Row, [{
         key: 'render',
         value: function render() {
-            var _props2 = this.props,
-                data = _props2.data,
-                order = _props2.order;
 
-            var metaData = utility.getDatainfo(this.props.data);
-            var canvasData = order.map(function (i) {
-                return data[i];
-            });
             return _react2.default.createElement(
                 'div',
                 { style: panelStyle },
                 _react2.default.createElement(
                     'div',
                     { style: canvasStyle },
-                    _react2.default.createElement(Canvas, { data: canvasData, metaData: metaData, width: this.props.width, height: this.props.height })
+                    _react2.default.createElement(Canvas, { data: this.props.data, dataType: this.props.dataType, dataRange: this.props.dataRange, width: this.props.width, height: this.props.height })
                 ),
-                _react2.default.createElement(Infopanel, { text: this.props.text, metaData: metaData, data: this.props.data, sortFn: this.props.sortFn, filterFn: this.props.filterFn })
+                _react2.default.createElement(Infopanel, { text: this.props.text, dataType: this.props.dataType, dataRange: this.props.dataRange, sortFn: this.props.sortFn, removeFn: this.props.removeFn })
             );
         }
     }]);
@@ -19336,34 +19307,82 @@ var Panel = function (_React$Component4) {
 
         var _this5 = _possibleConstructorReturn(this, (Panel.__proto__ || Object.getPrototypeOf(Panel)).call(this, props));
 
-        _this5.state = { order: utility.createArray(props.data.values[0].length), show: utility.createArray(props.data.values[0].length) };
+        _this5.state = { order: utility.createArray(props.data[0].values.length).map(function (d) {
+                return 0;
+            }), showRows: props.data.map(function (d) {
+                return d.name;
+            }) };
 
         return _this5;
     }
 
     _createClass(Panel, [{
         key: 'sortFn',
-        value: function sortFn(orderIndex) {
-            this.setState({ order: [].concat(_toConsumableArray(orderIndex)) });
+        value: function sortFn(entry) {
+            if (entry.type === 'number') {
+                this.setState({ order: [].concat(_toConsumableArray(entry.values)) });
+            } else {
+                this.setState(function (preState) {
+                    var current = entry.values.map(function (d) {
+                        return entry.range.indexOf(d);
+                    });
+                    return { order: preState.order.map(function (d, index) {
+                            return d * entry.range.length + current[index];
+                        }) };
+                });
+            }
         }
     }, {
-        key: 'filterFn',
-        value: function filterFn(filterIndex) {
-            this.setState({ show: [].concat(_toConsumableArray(filterIndex)) });
+        key: 'removeFn',
+        value: function removeFn(entryName) {
+            this.setState(function (prestate) {
+                return { showRows: prestate.showRows.filter(function (d) {
+                        return d !== entryName;
+                    }) };
+            });
         }
+
+        // filterFn(filterIndex){
+        //    this.setState({show:[...filterIndex]})
+        // }
+
     }, {
         key: 'render',
         value: function render() {
             var _this6 = this;
 
-            var _props$data = this.props.data,
-                values = _props$data.values,
-                keys = _props$data.keys;
+            var data = this.props.data;
+            var _state = this.state,
+                order = _state.order,
+                showRows = _state.showRows;
 
-            var rows = values.map(function (entry, index) {
-                return _react2.default.createElement(Row, { key: index, text: keys[index], data: entry.filter(function (d, i) {
-                        return _this6.state.show.includes(i);
-                    }), order: _this6.state.order, width: _this6.props.width, height: 60, sortFn: _this6.sortFn.bind(_this6), filterFn: _this6.filterFn.bind(_this6) });
+            var orderIndex = order.map(function (value, index) {
+                return { index: index, value: value };
+            }).sort(function (a, b) {
+                return a.value - b.value;
+            }).map(function (d) {
+                return d.index;
+            });
+
+            var rows = data.filter(function (d) {
+                return showRows.includes(d.name);
+            }).map(function (entry, index) {
+                return _react2.default.createElement(Row, { key: index,
+                    text: entry.name,
+                    data: orderIndex.map(function (i) {
+                        return entry.values[i];
+                    }),
+                    dataType: entry.type,
+                    dataRange: entry.range,
+                    width: _this6.props.width,
+                    height: 60,
+                    sortFn: function sortFn() {
+                        return _this6.sortFn(entry);
+                    },
+                    removeFn: function removeFn() {
+                        return _this6.removeFn(entry.name);
+                    }
+                });
             });
 
             return _react2.default.createElement(
@@ -19408,11 +19427,29 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function Options(props) {
+    return _react2.default.createElement(
+        'select',
+        { onChange: function onChange(e) {
+                return props.onChange(e.target.value);
+            } },
+        props.options.map(function (opt, index) {
+            return _react2.default.createElement(
+                'option',
+                { key: index, value: opt },
+                opt
+            );
+        })
+    );
+}
 
 var Selection = function (_React$Component) {
     _inherits(Selection, _React$Component);
@@ -19420,28 +19457,50 @@ var Selection = function (_React$Component) {
     function Selection(props) {
         _classCallCheck(this, Selection);
 
-        return _possibleConstructorReturn(this, (Selection.__proto__ || Object.getPrototypeOf(Selection)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (Selection.__proto__ || Object.getPrototypeOf(Selection)).call(this, props));
+
+        _this.state = { selected: [] };
+        return _this;
     }
 
     _createClass(Selection, [{
-        key: 'handleChange',
-        value: function handleChange(e) {
-            this.props.selectedHandler(e.target.value);
+        key: 'addItems',
+        value: function addItems(value) {
+            this.setState(function (prestate) {
+                return { selected: [].concat(_toConsumableArray(prestate.selected), [value]).filter(function (d, i, self) {
+                        return self.indexOf(d) === i;
+                    }) };
+            });
+        }
+    }, {
+        key: 'reset',
+        value: function reset() {
+            this.setState({ selected: [] });
         }
     }, {
         key: 'render',
         value: function render() {
-            var opts = this.props.options.map(function (opt, index) {
-                return _react2.default.createElement(
-                    'option',
-                    { key: index, value: opt },
-                    opt
-                );
-            });
             return _react2.default.createElement(
-                'select',
-                { onChange: this.handleChange.bind(this) },
-                opts
+                'div',
+                null,
+                _react2.default.createElement(
+                    'p',
+                    null,
+                    this.state.selected.join(',')
+                ),
+                _react2.default.createElement(Options, { options: this.props.options, onChange: this.addItems.bind(this) }),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: function onClick(e) {
+                            return console.log('done');
+                        } },
+                    'update'
+                ),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: this.reset.bind(this) },
+                    'reset'
+                )
             );
         }
     }]);
@@ -19474,13 +19533,15 @@ var _utility = __webpack_require__(140);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 // import tableApp from './reducers'
 // import { Provider } from 'react-redux'
 // import { createStore } from 'redux'
 
 var width = 1000,
     height = 1000,
-    dataset = {},
+    dataset = [],
     containerID = null;
 
 var renderModule = function renderModule() {
@@ -19498,7 +19559,7 @@ renderModule.setContainer = function (data) {
 
 renderModule.bindData = function (data) {
 	if (!arguments.length) return dataset;
-	dataset = data;
+	dataset = [].concat(_toConsumableArray(data));
 	return this;
 };
 

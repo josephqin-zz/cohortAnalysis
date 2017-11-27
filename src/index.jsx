@@ -8,7 +8,7 @@ import { pivotData } from './utility.js'
 
 var width = 1000,
 	height = 1000,
-	dataset = {},
+	dataset = [],
 	containerID = null;
 
 
@@ -33,7 +33,7 @@ renderModule.setContainer = function(data){
 
 renderModule.bindData = function(data){
 	if(!arguments.length) return dataset;
-	dataset = data;
+	dataset = [...data];
 	return this;
 }
 

@@ -115,16 +115,16 @@ export var canvasDrawV2 = function(ctx,dataset,width,height){
 }
 
 
-export var canvasDrawV3 = function(ctx,dataset,width,height,metaData){
+export var canvasDrawV3 = function(ctx,dataset,width,height,dataType,dataRange){
     
     let xScale = d3.scaleBand().range([0,width]).domain(d3.range(dataset.length));
     let bandwidth = xScale.bandwidth();
      let yScale = (d) => height;
     let colorfn = (d)=> 'steelblue';
-    if(metaData.type === 'number'){
+    if(dataType === 'number'){
 
     
-    yScale = d3.scaleLinear().range([height-5,0]).domain(metaData.range).nice();
+    yScale = d3.scaleLinear().range([height-5,0]).domain(dataRange).nice();
     let lineFunction = d3.line()
                                .x((d,index)=> xScale(index))
                                .y((d)=>d?yScale(d):yScale(0))
@@ -140,8 +140,8 @@ export var canvasDrawV3 = function(ctx,dataset,width,height,metaData){
 
     }else{
      
-     let cfn = colorMap(metaData.range.length)
-     colorfn = (e) => cfn(metaData.range.indexOf(e))
+     let cfn = colorMap(dataRange.length)
+     colorfn = (e) => cfn(dataRange.indexOf(e))
      dataset.forEach((e,index)=>{
         ctx.fillStyle = colorfn(e);
         ctx.fillRect(xScale(index),0,bandwidth,height)
@@ -193,3 +193,4 @@ export var sort2D=function(aa,rowid,fn){
       return aa.map((a)=>newindex.map((i)=>a[i]))
    }
 
+export var getSortIndex = (entry)=>entry.type==='number'?entry.values.map((value,index)=>({index,value})).sort((a,b)=>a.value-b.value).map(d=>d.index):entry.values.map((value,index)=>({index,value})).sort((a,b)=>entry.range.indexOf(a.value)-entry.range.indexOf(b.value)).map(d=>d.index)
