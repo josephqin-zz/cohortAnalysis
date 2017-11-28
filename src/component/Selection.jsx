@@ -1,4 +1,6 @@
 import React from 'react';
+
+
 function Options(props){
    return (
     <select onChange={(e)=>props.onChange(e.target.value)}>
@@ -24,8 +26,9 @@ export default class Selection extends React.Component{
     render(){
     return(
         <div>
+            <h4>{this.props.data.name}</h4>
             <p>{this.state.selected.join(',')}</p>
-            <Options options={this.props.options} onChange={this.addItems.bind(this)}/> 
+            <Options options={this.props.data.range} onChange={this.addItems.bind(this)}/> 
             <button  onClick={(e)=>console.log('done')}>update</button>
             <button  onClick={this.reset.bind(this)}>reset</button>
         </div>  

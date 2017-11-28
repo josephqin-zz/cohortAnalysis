@@ -44,7 +44,8 @@
         },[])
         
    
-    var test = pivotData(newdataset.filter((d)=>d.cell_name==='MOLM13' && d.reagent==='DMSO' && ['L-Arginine','D-Ribitol','3-Hydroxymethylglutaric acid'].includes(d.compound)));
+    // var test = pivotData(newdataset.filter((d)=>d.cell_name==='MOLM13' && d.reagent==='DMSO' && ['L-Arginine','D-Ribitol','3-Hydroxymethylglutaric acid'].includes(d.compound)));
+    var test = pivotData(newdataset);
     console.log(test);
     pfn = Panel.bindData(test).setContainer("container")
     pfn()
