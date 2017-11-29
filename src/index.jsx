@@ -33,7 +33,7 @@ renderModule.setContainer = function(data){
 
 renderModule.bindData = function(data){
 	if(!arguments.length) return dataset;
-	dataset = [...data];
+	dataset = data.sort((a,b)=>a.type[0]>b.type[0]?-1:1);
 	return this;
 }
 

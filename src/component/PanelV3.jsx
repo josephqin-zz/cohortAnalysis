@@ -51,11 +51,11 @@ class Infopanel extends React.Component{
 
    render(){
       return (
-        <div>
-            <div height={this.props.height}>
+        <div style={canvasStyle} height={this.props.height}>
+            
             <button onClick={this.props.sortFn}>{this.props.text}</button>
             <button onClick={this.props.removeFn}>&times;</button>
-            </div>
+           
         </div>
         )
    }
@@ -89,28 +89,27 @@ class Plot extends React.Component{
     constructor(props){
         super(props);
 
-        this.state={order:utility.createArray(props.data[0].values.length).map((d)=>0)}
+        this.state={groupModel:false,order:props.data[0].values.map((d)=>0)}
         
     }
 
+    componentWillReceiveProps(props) {
+       if(props.data[0].values.length !== this.state.order.length){this.setState({groupModel:false,order:props.data[0].values.map((d)=>0)});}
+       
+    }
+
     sortFn(entry){
-        if(entry.type==='number'){
-           this.setState({order:[...entry.values]}) 
-       }else{
+        if( this.state.groupModel){
            this.setState((preState)=>{
             let current = entry.values.map((d)=>entry.range.indexOf(d))
             return {order:preState.order.map((d,index)=>d*entry.range.length+current[index])}
            })
+       }else{
+           this.setState({order:entry.type==='number'?[...entry.values]:entry.values.map((d)=>entry.range.indexOf(d))}) 
        }
-        
-
+   
     }
 
-    
-
-    // filterFn(filterIndex){
-    //    this.setState({show:[...filterIndex]})
-    // }
 
     render(){ 
     
@@ -131,7 +130,11 @@ class Plot extends React.Component{
         />))
     
     return(
-        <div>
+        <div style={canvasStyle}>
+            <div>
+                <label><input checked={this.state.groupModel} type="checkbox" onChange={()=>this.setState(prestate=>({order:prestate.order.map((d)=>0),groupModel:!prestate.groupModel})) } />group sort</label>
+                <button onClick={()=>this.setState((prestate)=>({order:prestate.order.map((d)=>0)}))}>reset</button>
+            </div>
             { rows }
         </div>
         )
@@ -144,10 +147,11 @@ class Menu extends React.Component{
         super(props);
 
     }
+
     render(){
         return(
-            <div>
-                {this.props.data.map(d=>(<Selection data={d} />))}
+            <div style={canvasStyle}>
+                {this.props.data.map((d,index)=>(<Selection key={index} data={d} updateFn={this.props.updateFn} />))}
             </div>
             )
     }
@@ -157,20 +161,33 @@ class Menu extends React.Component{
 class Panel extends React.Component{
     constructor(props){
         super(props);
-        this.state={showRows:props.data.map((d)=>d.name)}
+        this.state={showRows:props.data.map((d)=>d.name),elms:props.data[0].values.map((d,index)=>index)}
     }
 
     removeFn(entryName){
        this.setState((prestate)=>({showRows:prestate.showRows.filter((d)=>d!==entryName)}))
     }
+    updateFn(key,chooseValue){
+        if(chooseValue.length>0){
+            let elmlist = this.props.data.filter((d)=>d.name===key)[0].values.map((d,index)=>chooseValue.includes(d)?index:-1).filter((d)=>d>-1)
+            this.setState((prestate)=>({elms:prestate.elms.filter((d)=>elmlist.includes(d))}))
+        }
+    }
 
     render(){
-        const dataset = this.props.data.filter((d)=>this.state.showRows.includes(d.name))
+        const {showRows,elms} = this.state
+        const dataset = this.props.data.map((d)=>{
+            if(showRows.includes(d.name)){
+            return {...d,values:elms.map((i)=>d.values[i])}
+            }
+        }).filter((d)=>typeof d!=='undefined')
         return(
         <div>
+            <button onClick={()=>this.setState({elms:this.props.data[0].values.map((d,index)=>index)})}>Filter Clean</button>
+            <Menu updateFn={this.updateFn.bind(this)} data={dataset.filter((d)=>d.type!=='number').map((d)=>{ let {name,range}=d; return{name,range} })}/>
             
             <Plot data={dataset} removeFn={this.removeFn.bind(this)} width={this.props.width} height={this.props.height}/>
-            <Menu data={dataset.filter((d)=>d.type!=='number').map((d)=>{ let {name,range}=d; return{name,range} })}/>
+            
         </div>
         )
     }

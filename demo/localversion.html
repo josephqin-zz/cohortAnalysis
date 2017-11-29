@@ -1,0 +1,65 @@
+<html>
+	<head>
+		<script src='http://d3js.org/d3.v4.js'></script>
+		<script src="../build/myCode.js"></script>
+	</head>
+	<body>
+    <div>
+    <input type="file" id="myFile" multiple size="50" onchange="uploadFile(event)">
+    <div>
+
+	 	<div id="container"></div>
+
+	</body>
+	<script>
+    function uploadFile(event){
+      var x = event.target;
+      if('files' in x){
+        let reader = new FileReader();
+        reader.onloadend = function(e){
+          console.log(e);
+        }
+        reader.readAsBinaryString(x.files[0])
+      }
+    }
+
+
+
+
+    //check the col attribute   
+    var getDatainfo = function(attr,dataset){
+      if(dataset.every((v)=>typeof v ==='number')){
+      
+        return {name:attr,values:dataset,type:'number',range:[d3.min(dataset),d3.max(dataset)]}
+      
+      }else{
+        
+        return {name:attr,values:dataset,type:'string',range:dataset.filter((d,i,self)=>self.indexOf(d)===i && d)}
+      }
+
+    }
+    //piovot table structure
+    var pivotData = data => data.reduce((acc,d)=>{
+          let diff = Object.keys(d).filter((a)=>acc.map(d=>d.name).indexOf(a)===-1);
+          if(diff.length>0){
+            return [...acc,...diff.map((a)=>getDatainfo(a,data.map((d)=>d[a])))]
+          }
+          else{
+            return acc;
+          }
+        },[])
+   
+    
+
+
+
+
+
+
+
+    // pfn = Panel.bindData(dataset).setContainer("container")
+    // pfn()
+
+   
+	</script>
+</html>

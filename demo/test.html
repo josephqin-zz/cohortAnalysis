@@ -1,25 +1,26 @@
 <html>
 	<head>
 		<script src='http://d3js.org/d3.v4.js'></script>
-		<script src="test.js"></script>
+		<script src="test2.js"></script>
 		<script src="../build/myCode.js"></script>
 		
 	
 	</head>
 	<body>
+
 	 	<div id="container"></div>
 
 	</body>
 	<script>
 
-    const {samples,values} = dataset
+    // const {samples,values} = dataset
 
-    var sampleMap=samples.reduce((acc,s)=>{
-      let {cell_name,reagent,stime,complex,sample_id} = s;
-      acc[sample_id]={cell_name,reagent,stime,complex}
-      return acc;
-    },{})
-    var newdataset = values.map((v)=>({...v,...sampleMap[v.sample_id]}))
+    // var sampleMap=samples.reduce((acc,s)=>{
+    //   let {cell_name,reagent,stime,complex,sample_id} = s;
+    //   acc[sample_id]={cell_name,reagent,stime,complex}
+    //   return acc;
+    // },{})
+    // var newdataset = values.map((v)=>({...v,...sampleMap[v.sample_id]}))
     
     var getDatainfo = function(attr,dataset){
       if(dataset.every((v)=>typeof v ==='number')){
@@ -45,9 +46,9 @@
         
    
     // var test = pivotData(newdataset.filter((d)=>d.cell_name==='MOLM13' && d.reagent==='DMSO' && ['L-Arginine','D-Ribitol','3-Hydroxymethylglutaric acid'].includes(d.compound)));
-    var test = pivotData(newdataset);
-    console.log(test);
-    pfn = Panel.bindData(test).setContainer("container")
+    // var test = pivotData(dataset);
+    console.log(dataset);
+    pfn = Panel.bindData(dataset).setContainer("container")
     pfn()
 
 

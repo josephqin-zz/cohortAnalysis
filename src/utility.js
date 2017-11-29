@@ -141,7 +141,7 @@ export var canvasDrawV3 = function(ctx,dataset,width,height,dataType,dataRange){
     }else{
      
      let cfn = colorMap(dataRange.length)
-     colorfn = (e) => cfn(dataRange.indexOf(e))
+     let colorfn = (e) => cfn(dataRange.indexOf(e))
      dataset.forEach((e,index)=>{
         ctx.fillStyle = colorfn(e);
         ctx.fillRect(xScale(index),0,bandwidth,height)
