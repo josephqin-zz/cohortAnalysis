@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDom from 'react-dom'
-import Panel from './component/PanelV3.jsx'
+import Panel from './component/PanelV4.jsx'
 import { pivotData } from './utility.js'
 // import tableApp from './reducers'
 // import { Provider } from 'react-redux'

@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<script src='http://d3js.org/d3.v4.js'></script>
-		<script src="../build/myCode.js"></script>
+		<script src="../build/myCodeV2.js"></script>
 	</head>
 	<body>
     <div>
@@ -24,11 +24,29 @@
         let reader = new FileReader();
         reader.onloadend = function(e){
           let content = e.target.result.split('\r').map((d)=>d.split(',').map(t=>t.length===0?0:(isnum(t)?+t:t)));
-          let dataset = content[0].map((name,index)=>getDatainfo(name,content.filter((d,index)=>index>0 && d.length===content[0].length).map(r=>r[index])))
-          // console.log(dataset)
+          let dataset = content.map((row,id)=>{
+            let name = row[1]
+            let values = []
+            let range = []
+            let type = ""
+            if(id===0){
+              name='copynumber'
+              values = row.filter((d,i)=>i>1).map((s)=>{let t=s.split('_');return t[1]+'_'+t[3]})
+              range = values.filter((d,i,self)=>self.indexOf(d)===i && d)
+              type='string'
+            }else{
+              type='number'
+              values = row.filter((d,i)=>i>1)
+              range = [d3.min(values),d3.max(values)]
+             
+            }
+             return { name,values,range,type}
+          })
+          // let dataset = content[0].map((name,index)=>getDatainfo(name,content.filter((d,index)=>index>0 && d.length===content[0].length).map(r=>r[index])))
+          console.log(dataset)
           let pfn = Panel.bindData(dataset).setContainer("container")
           pfn()
-          // console.log(content)
+          
 
         }
         reader.readAsBinaryString(x.files[0])

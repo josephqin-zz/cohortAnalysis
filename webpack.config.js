@@ -11,7 +11,7 @@ var config = {
     path:OUTPUT,
     library:'Panel',
     libraryTarget:'umd',
-    filename:'myCode.js'
+    filename:'myCodeV2.js'
   },
   module: {
     loaders: [{
