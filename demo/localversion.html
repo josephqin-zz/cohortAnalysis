@@ -12,12 +12,24 @@
 
 	</body>
 	<script>
+    var isnum = val => /^\d+$/.test(val)
+
+    function transpose(a) {
+    return a[0].map(function (_, c) { return a.map(function (r) { return r[c]; }); });
+    }
+
     function uploadFile(event){
       var x = event.target;
       if('files' in x){
         let reader = new FileReader();
         reader.onloadend = function(e){
-          console.log(e);
+          let content = e.target.result.split('\r').map((d)=>d.split(',').map(t=>t.length===0?0:(isnum(t)?+t:t)));
+          let dataset = content[0].map((name,index)=>getDatainfo(name,content.filter((d,index)=>index>0 && d.length===content[0].length).map(r=>r[index])))
+          // console.log(dataset)
+          let pfn = Panel.bindData(dataset).setContainer("container")
+          pfn()
+          // console.log(content)
+
         }
         reader.readAsBinaryString(x.files[0])
       }
@@ -57,8 +69,7 @@
 
 
 
-    // pfn = Panel.bindData(dataset).setContainer("container")
-    // pfn()
+    
 
    
 	</script>
